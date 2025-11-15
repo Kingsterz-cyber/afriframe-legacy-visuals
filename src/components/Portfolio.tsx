@@ -4,6 +4,13 @@ import weddingIndoor from "@/assets/wedding-indoor.jpg";
 import chefPortrait from "@/assets/chef-portrait.jpg";
 import fashionPortrait from "@/assets/fashion-portrait.jpg";
 import fashionJewelry from "@/assets/fashion-jewelry.jpg";
+import redDressRose from "@/assets/red-dress-rose.jpg";
+import graduationPortrait from "@/assets/graduation-portrait.jpg";
+import blueHatFashion from "@/assets/blue-hat-fashion.jpg";
+import redSuitPink from "@/assets/red-suit-pink.jpg";
+import mysteryHat from "@/assets/mystery-hat.jpg";
+import bridalPortrait from "@/assets/bridal-portrait.jpg";
+import lifestylePortrait from "@/assets/lifestyle-portrait.jpg";
 
 const Portfolio = () => {
   const [activeFilter, setActiveFilter] = useState("All");
@@ -27,24 +34,73 @@ const Portfolio = () => {
     },
     {
       id: 3,
+      image: bridalPortrait,
+      title: "Radiant Bride",
+      category: "Weddings",
+      description: "Stunning bridal portrait with elegant details"
+    },
+    {
+      id: 4,
       image: chefPortrait,
       title: "Culinary Artist",
       category: "Commercial",
       description: "Professional brand photography for hospitality"
     },
     {
-      id: 4,
+      id: 5,
       image: fashionPortrait,
       title: "Editorial Portrait",
       category: "Portraits",
       description: "Fashion-forward lifestyle photography"
     },
     {
-      id: 5,
+      id: 6,
       image: fashionJewelry,
       title: "Luxury Accessories",
       category: "Commercial",
       description: "Product and lifestyle photography fusion"
+    },
+    {
+      id: 7,
+      image: redDressRose,
+      title: "Romantic Elegance",
+      category: "Portraits",
+      description: "Creative studio portrait with vibrant colors"
+    },
+    {
+      id: 8,
+      image: graduationPortrait,
+      title: "Milestone Achievement",
+      category: "Portraits",
+      description: "Dramatic graduation photography with cinematic lighting"
+    },
+    {
+      id: 9,
+      image: blueHatFashion,
+      title: "Bold Fashion",
+      category: "Portraits",
+      description: "High-fashion editorial with statement accessories"
+    },
+    {
+      id: 10,
+      image: redSuitPink,
+      title: "Power & Style",
+      category: "Commercial",
+      description: "Contemporary fashion photography for brand campaigns"
+    },
+    {
+      id: 11,
+      image: mysteryHat,
+      title: "Artistic Mystery",
+      category: "Portraits",
+      description: "Moody and artistic portrait with dramatic shadows"
+    },
+    {
+      id: 12,
+      image: lifestylePortrait,
+      title: "Natural Beauty",
+      category: "Portraits",
+      description: "Soft lifestyle portrait with warm natural light"
     },
   ];
 
