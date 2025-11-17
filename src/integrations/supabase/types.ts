@@ -14,7 +14,157 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      booking_dates: {
+        Row: {
+          available: boolean | null
+          date: string
+          id: string
+          notes: string | null
+          service_id: string
+          slots: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          available?: boolean | null
+          date: string
+          id?: string
+          notes?: string | null
+          service_id: string
+          slots?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          available?: boolean | null
+          date?: string
+          id?: string
+          notes?: string | null
+          service_id?: string
+          slots?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_dates_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          booking_date: string
+          created_at: string | null
+          email: string
+          id: string
+          message: string | null
+          name: string
+          payment_provider: string | null
+          payment_reference: string | null
+          payment_status: string | null
+          phone: string
+          service_id: string
+          slot_time: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          booking_date: string
+          created_at?: string | null
+          email: string
+          id?: string
+          message?: string | null
+          name: string
+          payment_provider?: string | null
+          payment_reference?: string | null
+          payment_status?: string | null
+          phone: string
+          service_id: string
+          slot_time?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          booking_date?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string | null
+          name?: string
+          payment_provider?: string | null
+          payment_reference?: string | null
+          payment_status?: string | null
+          phone?: string
+          service_id?: string
+          slot_time?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          role: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          role?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string | null
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          name: string
+          starting_price: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          name: string
+          starting_price?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          name?: string
+          starting_price?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
