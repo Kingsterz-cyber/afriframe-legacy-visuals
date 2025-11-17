@@ -44,7 +44,7 @@ const Navigation = () => {
               <Button 
                 size="sm"
                 className="afri-glass border-2 border-primary hover:bg-primary/20"
-                onClick={() => scrollToSection('#contact')}
+                onClick={() => window.location.href = '/booking'}
               >
                 Book Now
               </Button>
@@ -75,7 +75,7 @@ const Navigation = () => {
                 <Button 
                   size="sm"
                   className="w-full afri-glass border-2 border-primary hover:bg-primary/20"
-                  onClick={() => scrollToSection('#contact')}
+                  onClick={() => window.location.href = '/booking'}
                 >
                   Book Now
                 </Button>

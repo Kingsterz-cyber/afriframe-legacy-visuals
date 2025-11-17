@@ -39,7 +39,7 @@ const Hero = () => {
               <Button 
                 size="lg" 
                 className="text-lg px-8 py-6 afri-glass border-2 border-primary hover:bg-primary/20"
-                onClick={() => scrollToSection('contact')}
+                onClick={() => window.location.href = '/booking'}
               >
                 Book a Shoot
               </Button>
