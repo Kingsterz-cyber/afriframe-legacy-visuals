@@ -10,7 +10,8 @@ const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, user } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,13 +24,19 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await signIn(email, password);
+    const { error } = isSignUp 
+      ? await signUp(email, password)
+      : await signIn(email, password);
 
     if (error) {
-      toast.error(error.message || 'Login failed');
+      toast.error(error.message || (isSignUp ? 'Sign up failed' : 'Login failed'));
     } else {
-      toast.success('Welcome back!');
-      navigate('/admin');
+      if (isSignUp) {
+        toast.success('Account created! Please check your email to confirm.');
+      } else {
+        toast.success('Welcome back!');
+        navigate('/admin');
+      }
     }
 
     setLoading(false);
@@ -40,7 +47,7 @@ const AdminLogin = () => {
       <div className="afri-glass p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <Camera className="w-12 h-12 mx-auto mb-4 text-accent" />
-          <h1 className="font-display text-3xl mb-2">Admin Login</h1>
+          <h1 className="font-display text-3xl mb-2">{isSignUp ? 'Admin Sign Up' : 'Admin Login'}</h1>
           <p className="text-muted-foreground">Afriframe Pictures</p>
         </div>
 
@@ -72,15 +79,23 @@ const AdminLogin = () => {
             className="w-full" 
             disabled={loading}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? (isSignUp ? 'Creating account...' : 'Signing in...') : (isSignUp ? 'Sign Up' : 'Sign In')}
           </Button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground mt-6">
-          <a href="/" className="hover:text-accent transition-colors">
-            ← Back to website
-          </a>
-        </p>
+        <div className="text-center text-sm text-muted-foreground mt-6 space-y-2">
+          <button 
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="hover:text-accent transition-colors"
+          >
+            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+          </button>
+          <p>
+            <a href="/" className="hover:text-accent transition-colors">
+              ← Back to website
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );
