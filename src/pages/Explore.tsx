@@ -167,7 +167,7 @@ const Explore = () => {
           </div>
 
           {/* Interactive Video Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {videoShowcase.map((video, index) => (
               <div
                 key={video.id}
@@ -178,7 +178,7 @@ const Explore = () => {
               >
                 {/* Rotating Video Card */}
                 <div
-                  className={`relative aspect-[9/16] rounded-3xl overflow-hidden transition-all duration-700 ease-out cursor-pointer ${
+                  className={`relative aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-700 ease-out cursor-pointer ${
                     hoveredVideo === video.id || activeVideo === video.id
                       ? "transform-gpu rotate-y-0 scale-105 shadow-2xl shadow-primary/20"
                       : "transform-gpu rotate-y-6 hover:rotate-y-0"
