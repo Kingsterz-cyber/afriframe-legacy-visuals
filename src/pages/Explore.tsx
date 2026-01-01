@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Play, Pause } from "lucide-react";
+import { ArrowLeft, Play, Pause, X, RotateCcw, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Portrait images
@@ -46,7 +46,10 @@ const videoShowcase = [
 const Explore = () => {
   const [activeVideo, setActiveVideo] = useState<number | null>(null);
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
+  const [modalVideo, setModalVideo] = useState<typeof videoShowcase[0] | null>(null);
+  const [modalRotation, setModalRotation] = useState(0);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+  const modalVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const handleVideoHover = (id: number, isHovering: boolean) => {
     setHoveredVideo(isHovering ? id : null);
@@ -61,17 +64,29 @@ const Explore = () => {
     }
   };
 
-  const toggleVideoPlay = (id: number) => {
-    const video = videoRefs.current[id];
-    if (video) {
-      if (activeVideo === id) {
-        video.pause();
-        setActiveVideo(null);
+  const openVideoModal = (video: typeof videoShowcase[0]) => {
+    setModalVideo(video);
+    setModalRotation(0);
+    // Pause all grid videos
+    Object.values(videoRefs.current).forEach(v => v?.pause());
+    setActiveVideo(null);
+  };
+
+  const closeVideoModal = () => {
+    setModalVideo(null);
+    setModalRotation(0);
+  };
+
+  const rotateVideo = (direction: 'left' | 'right') => {
+    setModalRotation(prev => prev + (direction === 'left' ? -15 : 15));
+  };
+
+  const toggleModalVideoPlay = () => {
+    if (modalVideoRef.current) {
+      if (modalVideoRef.current.paused) {
+        modalVideoRef.current.play();
       } else {
-        // Pause any currently playing video
-        Object.values(videoRefs.current).forEach(v => v?.pause());
-        video.play();
-        setActiveVideo(id);
+        modalVideoRef.current.pause();
       }
     }
   };
@@ -167,7 +182,7 @@ const Explore = () => {
           </div>
 
           {/* Interactive Video Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 max-w-3xl mx-auto px-2">
             {videoShowcase.map((video, index) => (
               <div
                 key={video.id}
@@ -176,21 +191,21 @@ const Explore = () => {
                 onMouseEnter={() => handleVideoHover(video.id, true)}
                 onMouseLeave={() => handleVideoHover(video.id, false)}
               >
-                {/* Rotating Video Card */}
+                {/* Video Card */}
                 <div
-                  className={`relative aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-700 ease-out cursor-pointer ${
-                    hoveredVideo === video.id || activeVideo === video.id
-                      ? "transform-gpu rotate-y-0 scale-105 shadow-2xl shadow-primary/20"
-                      : "transform-gpu rotate-y-6 hover:rotate-y-0"
+                  className={`relative aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-700 ease-out cursor-pointer ${
+                    hoveredVideo === video.id
+                      ? "scale-105 shadow-2xl shadow-primary/20"
+                      : ""
                   }`}
                   style={{
                     perspective: "1000px",
                     transformStyle: "preserve-3d",
-                    transform: hoveredVideo === video.id || activeVideo === video.id 
+                    transform: hoveredVideo === video.id
                       ? "rotateY(0deg) scale(1.05)" 
-                      : `rotateY(${index % 2 === 0 ? "-6" : "6"}deg)`,
+                      : `rotateY(${index % 2 === 0 ? "-4" : "4"}deg)`,
                   }}
-                  onClick={() => toggleVideoPlay(video.id)}
+                  onClick={() => openVideoModal(video)}
                 >
                   <video
                     ref={(el) => (videoRefs.current[video.id] = el)}
@@ -201,16 +216,12 @@ const Explore = () => {
                     playsInline
                   />
 
-                  {/* Play/Pause Overlay */}
+                  {/* Play Overlay */}
                   <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
                     hoveredVideo === video.id ? "opacity-100" : "opacity-0"
                   }`}>
-                    <div className="w-16 h-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center border border-primary/30 transition-transform duration-300 hover:scale-110">
-                      {activeVideo === video.id ? (
-                        <Pause className="w-6 h-6 text-primary" />
-                      ) : (
-                        <Play className="w-6 h-6 text-primary ml-1" />
-                      )}
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center border border-primary/30">
+                      <Play className="w-4 h-4 sm:w-5 sm:h-5 text-primary ml-0.5" />
                     </div>
                   </div>
 
@@ -218,30 +229,107 @@ const Explore = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60" />
 
                   {/* Video Info */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-xl font-bold mb-1">{video.title}</h3>
-                    <p className="text-sm text-muted-foreground">{video.description}</p>
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
+                    <h3 className="text-sm sm:text-base font-bold mb-0.5">{video.title}</h3>
+                    <p className="text-xs text-muted-foreground hidden sm:block">{video.description}</p>
                   </div>
 
-                  {/* Glow Effect */}
-                  <div className={`absolute inset-0 rounded-3xl border-2 transition-all duration-500 ${
-                    hoveredVideo === video.id || activeVideo === video.id
+                  {/* Border Glow */}
+                  <div className={`absolute inset-0 rounded-xl sm:rounded-2xl border-2 transition-all duration-500 ${
+                    hoveredVideo === video.id
                       ? "border-primary/50 shadow-lg shadow-primary/20"
                       : "border-transparent"
                   }`} />
                 </div>
-
-                {/* Reflection Effect */}
-                <div 
-                  className="absolute -bottom-4 left-4 right-4 h-20 rounded-3xl opacity-20 blur-xl transition-opacity duration-500"
-                  style={{
-                    background: "linear-gradient(to bottom, hsl(var(--primary) / 0.3), transparent)",
-                    opacity: hoveredVideo === video.id ? 0.4 : 0.2
-                  }}
-                />
               </div>
             ))}
           </div>
+
+          {/* Video Modal */}
+          {modalVideo && (
+            <div 
+              className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-md animate-fade-in"
+              onClick={closeVideoModal}
+            >
+              <div 
+                className="relative max-w-lg w-[90vw] sm:w-[70vw] md:w-[50vw] lg:w-[40vw]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={closeVideoModal}
+                  className="absolute -top-12 right-0 p-2 text-muted-foreground hover:text-foreground transition-colors z-10"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+
+                {/* Rotate Controls */}
+                <div className="absolute -top-12 left-0 flex gap-2 z-10">
+                  <button
+                    onClick={() => rotateVideo('left')}
+                    className="p-2 rounded-full bg-secondary/50 text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  >
+                    <RotateCcw className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => rotateVideo('right')}
+                    className="p-2 rounded-full bg-secondary/50 text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  >
+                    <RotateCw className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Video Container with Rotation */}
+                <div
+                  className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl shadow-primary/30 transition-transform duration-500 ease-out"
+                  style={{
+                    transform: `perspective(1000px) rotateY(${modalRotation}deg)`,
+                    transformStyle: "preserve-3d",
+                  }}
+                >
+                  <video
+                    ref={modalVideoRef}
+                    src={modalVideo.src}
+                    className="w-full h-full object-cover"
+                    loop
+                    autoPlay
+                    playsInline
+                    onClick={toggleModalVideoPlay}
+                  />
+
+                  {/* Play/Pause Overlay */}
+                  <div 
+                    className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                    onClick={toggleModalVideoPlay}
+                  >
+                    <div className="w-16 h-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center border border-primary/30">
+                      <Play className="w-6 h-6 text-primary ml-1" />
+                    </div>
+                  </div>
+
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+
+                  {/* Video Info */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 pointer-events-none">
+                    <h3 className="text-xl font-bold mb-1">{modalVideo.title}</h3>
+                    <p className="text-sm text-muted-foreground">{modalVideo.description}</p>
+                  </div>
+
+                  {/* Border Glow */}
+                  <div className="absolute inset-0 rounded-2xl border-2 border-primary/30" />
+                </div>
+
+                {/* Reflection */}
+                <div 
+                  className="absolute -bottom-6 left-4 right-4 h-16 rounded-2xl opacity-30 blur-xl"
+                  style={{
+                    background: "linear-gradient(to bottom, hsl(var(--primary) / 0.4), transparent)",
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
