@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Camera, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,6 +9,7 @@ const Navigation = () => {
   const navItems = [
     { label: "Home", href: "#home" },
     { label: "Portfolio", href: "#portfolio" },
+    { label: "Explore", href: "/explore", isLink: true },
     { label: "Services", href: "#services" },
     { label: "About", href: "#about" },
     { label: "Contact", href: "#contact" },
@@ -33,13 +35,23 @@ const Navigation = () => {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
               {navItems.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => scrollToSection(item.href)}
-                  className="text-foreground/80 hover:text-foreground transition-colors"
-                >
-                  {item.label}
-                </button>
+                item.isLink ? (
+                  <Link
+                    key={item.label}
+                    to={item.href}
+                    className="text-foreground/80 hover:text-foreground transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <button
+                    key={item.label}
+                    onClick={() => scrollToSection(item.href)}
+                    className="text-foreground/80 hover:text-foreground transition-colors"
+                  >
+                    {item.label}
+                  </button>
+                )
               ))}
               <Button 
                 size="sm"
@@ -64,13 +76,24 @@ const Navigation = () => {
             <div className="md:hidden mt-4 pt-4 border-t border-foreground/10">
               <div className="flex flex-col gap-4">
                 {navItems.map((item) => (
-                  <button
-                    key={item.label}
-                    onClick={() => scrollToSection(item.href)}
-                    className="text-left text-foreground/80 hover:text-foreground transition-colors py-2"
-                  >
-                    {item.label}
-                  </button>
+                  item.isLink ? (
+                    <Link
+                      key={item.label}
+                      to={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className="text-left text-foreground/80 hover:text-foreground transition-colors py-2"
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <button
+                      key={item.label}
+                      onClick={() => scrollToSection(item.href)}
+                      className="text-left text-foreground/80 hover:text-foreground transition-colors py-2"
+                    >
+                      {item.label}
+                    </button>
+                  )
                 ))}
                 <Button 
                   size="sm"
