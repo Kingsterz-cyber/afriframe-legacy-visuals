@@ -9,7 +9,7 @@ const getInitial = (): Theme => {
   if (typeof window === "undefined") return "dark";
   const stored = localStorage.getItem("afriframe-theme") as Theme | null;
   if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  return "dark";
 };
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {

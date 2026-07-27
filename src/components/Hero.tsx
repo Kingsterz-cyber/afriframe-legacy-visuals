@@ -200,7 +200,6 @@ const Hero = () => {
             <img
               src={cameraAsset.url}
               alt="Luxury black and gold camera lens illuminated by warm studio light"
-              fetchPriority="high"
               className="camera-mask w-full select-none object-contain drop-shadow-[0_40px_80px_hsl(0_0%_0%/0.5)]"
             />
             {/* Reflection */}
