@@ -143,7 +143,7 @@ const Booking = () => {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="afri-glass p-8 space-y-6">
+          <form onSubmit={handleSubmit} className="lux-card p-8 space-y-6">
             {/* Service Selection */}
             <div>
               <label className="block text-sm font-medium mb-2">Select Service *</label>

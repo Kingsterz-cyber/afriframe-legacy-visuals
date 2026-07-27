@@ -105,7 +105,7 @@ const Hero = () => {
             transition={{ delay: 0.15, duration: 0.7 }}
             className="eyebrow"
           >
-            Afriframe Studio — Photography &amp; Cinematic Storytelling
+            Afriframe Studio — Cinematic Storytelling
           </motion.p>
 
           <h1 className="display mt-6 font-medium text-foreground">
