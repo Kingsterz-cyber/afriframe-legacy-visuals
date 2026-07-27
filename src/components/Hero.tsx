@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import cameraAsset from "@/assets/camera.jpg.asset.json";
+import cameraImage from "@/assets/camera.jpg";
 
 const headline = [["Every", "Frame"], ["Tells"], ["A", "Story."]];
 
@@ -198,7 +198,7 @@ const Hero = () => {
 
           <div className="animate-float relative">
             <img
-              src={cameraAsset.url}
+              src={cameraImage}
               alt="Luxury black and gold camera lens illuminated by warm studio light"
               className="camera-mask w-full select-none object-contain drop-shadow-[0_40px_80px_hsl(0_0%_0%/0.5)]"
             />
@@ -207,7 +207,7 @@ const Hero = () => {
               aria-hidden
               className="camera-mask pointer-events-none absolute inset-x-0 top-[86%] h-40 scale-y-[-1] opacity-[0.08] blur-md"
               style={{
-                backgroundImage: `url(${cameraAsset.url})`,
+                backgroundImage: `url(${cameraImage})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
