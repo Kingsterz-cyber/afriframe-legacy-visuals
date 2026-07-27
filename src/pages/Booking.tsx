@@ -134,7 +134,7 @@ const Booking = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="container mx-auto px-4 py-20">
+      <main className="lux-container pb-24 pt-36">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="font-display text-5xl mb-4 text-foreground">Book Your Session</h1>
