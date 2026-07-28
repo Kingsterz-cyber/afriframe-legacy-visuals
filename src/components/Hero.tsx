@@ -71,8 +71,9 @@ const Hero = () => {
       />
       <div
         aria-hidden
-        className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,hsl(240_3%_3%/0.78)_0%,transparent_28%,transparent_62%,hsl(240_3%_3%/0.7)_100%)] md:bg-[linear-gradient(180deg,hsl(240_3%_3%/0.55)_0%,transparent_30%,transparent_70%,hsl(240_3%_3%/0.6)_100%)]"
+        className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,hsl(240_3%_3%/0.9)_0%,hsl(240_3%_3%/0.62)_45%,hsl(240_3%_3%/0.78)_100%)] md:bg-[linear-gradient(180deg,hsl(240_3%_3%/0.55)_0%,transparent_30%,transparent_70%,hsl(240_3%_3%/0.6)_100%)]"
       />
+
       {/* Vignette + warm bloom */}
       <div
         aria-hidden
