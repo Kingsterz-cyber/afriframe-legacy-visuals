@@ -8,13 +8,13 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    middlewareMode: false,
-    // Allow all hosts - needed for V0/Lovable sandbox
+    // Allow all hosts for V0/Lovable development
     allowedHosts: [
-      'all',
-      '*.vercel.run',
-      'localhost',
+      ".vercel.run",
+      "localhost",
+      "127.0.0.1",
     ],
+    strictPort: false,
   },
   plugins: [
     react(),
