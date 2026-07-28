@@ -196,7 +196,7 @@ const Hero = () => {
           Scroll to Explore
         </span>
         <span className="relative h-px w-16 overflow-hidden bg-[hsl(0_0%_100%/0.2)]">
-          <span className="absolute inset-y-0 left-0 w-6 animate-[shimmer_2.4s_ease-in-out_infinite] bg-primary" />
+          <motion.span animate={{ x: ["-100%", "260%"] }} transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-y-0 left-0 w-6 bg-primary" />
         </span>
       </motion.div>
     </section>
