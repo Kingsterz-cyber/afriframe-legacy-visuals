@@ -8,10 +8,12 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    // Configure allowed hosts based on environment
-    allowedHosts: mode === "development" 
-      ? "all" 
-      : ["sb-6tchrpwlp4tk.vercel.run", "your-production-domain.com"],
+    // Allow all hosts and specific vercel domains
+    allowedHosts: [
+      "all",
+      "sb-8fc1pnc5vbh1.vercel.run",
+      "*.vercel.run",
+    ],
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
