@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, RotateCw } from "lucide-react";
 
 interface PremiumVideoPlayerProps {
   src: string;
@@ -20,6 +20,7 @@ export const PremiumVideoPlayer = ({
   const [duration, setDuration] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [rotation, setRotation] = useState(0);
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
 
   const handlePlayPause = () => {
@@ -32,6 +33,10 @@ export const PremiumVideoPlayer = ({
         setIsPlaying(false);
       }
     }
+  };
+
+  const handleRotate = () => {
+    setRotation((prev) => (prev + 90) % 360);
   };
 
   const handleTimeUpdate = () => {
@@ -87,18 +92,26 @@ export const PremiumVideoPlayer = ({
       }}
       onMouseMove={handleMouseMove}
     >
-      {/* Video Element */}
-      <video
-        ref={videoRef}
-        src={src}
-        className="w-full h-full object-cover"
-        autoPlay
-        muted
-        playsInline
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onEnded={() => setIsPlaying(false)}
-      />
+      {/* Video Container with Rotation */}
+      <div
+        className="w-full h-full transition-transform duration-500 ease-out flex items-center justify-center"
+        style={{
+          transform: `rotate(${rotation}deg)`,
+        }}
+      >
+        {/* Video Element */}
+        <video
+          ref={videoRef}
+          src={src}
+          className="w-full h-full object-cover"
+          autoPlay
+          muted
+          playsInline
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onEnded={() => setIsPlaying(false)}
+        />
+      </div>
 
       {/* Large Animated Play Button Overlay */}
       <div
@@ -150,6 +163,14 @@ export const PremiumVideoPlayer = ({
               {formatTime(videoRef.current?.currentTime || 0)} / {formatTime(duration)}
             </span>
           </div>
+          <button
+            onClick={handleRotate}
+            className="p-2 hover:bg-white/20 rounded-full transition-all duration-200 hover:scale-110"
+            aria-label="Rotate video 90 degrees clockwise"
+            title={`Rotate (${rotation}°)`}
+          >
+            <RotateCw className="w-5 h-5" style={{ transform: `rotate(${rotation}deg)` }} />
+          </button>
         </div>
       </div>
 
