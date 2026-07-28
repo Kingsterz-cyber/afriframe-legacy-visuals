@@ -8,8 +8,13 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    // Allow ALL hosts - this is the most reliable fix for V0/Lovable
-    allowedHosts: "all",
+    middlewareMode: false,
+    // Allow all hosts - needed for V0/Lovable sandbox
+    allowedHosts: [
+      'all',
+      '*.vercel.run',
+      'localhost',
+    ],
   },
   plugins: [
     react(),
