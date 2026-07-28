@@ -8,14 +8,13 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    // Allow all hosts and specific vercel domains
-    allowedHosts: [
-      "all",
-      "sb-8fc1pnc5vbh1.vercel.run",
-      "*.vercel.run",
-    ],
+    // Allow ALL hosts - this is the most reliable fix for V0/Lovable
+    allowedHosts: "all",
   },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [
+    react(),
+    mode === "development" && componentTagger()
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
