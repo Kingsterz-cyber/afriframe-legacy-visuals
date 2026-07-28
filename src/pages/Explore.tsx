@@ -5,74 +5,90 @@ import { Button } from "@/components/ui/button";
 import { PremiumVideoPlayer } from "@/components/ui/premium-video-player";
 import { CollectionSection } from "@/components/portfolio/collection-section";
 import { CategoryFilters } from "@/components/portfolio/category-filters";
+import { VideoCollectionGrid } from "@/components/portfolio/video-collection-grid";
+import { CollectionDetailModal } from "@/components/portfolio/collection-detail-modal";
 
-// Portrait images
+// New provided images - using blob URLs
+const familyPortrait = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/imgi_18_491439725_18497317444016923_86191005857537098_n-WcTN2AcOJwfT2TnRJ3ArnYbWMOJraB.jpg";
+const turquoiseGown = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/imgi_6_463119922_18461666416016923_2214342906593189758_n-4Ibq4gqiOWh4snUlfgOWLjsEsJK5Ko.jpg";
+const chefWhisk = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/482550348_18488340502016923_4794447291881132350_n-0CBJXcrQv6ErgGVEIOoDtfNSWMHRLX.jpg";
+const businessWoman = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/724118718_18593416486039347_3939844573745523097_n-piBh2WaIMducTHHWAXTgnlXWXNiXpo.jpg";
+const womensDayPoster = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/483347684_18489053758016923_3319694039426042132_n-7otDCX9yRC84et3vu9SmUwAY6dWlWz.jpg";
+const beautyPortrait = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/487446290_18048925673346357_5977272209636599575_n-941qFGvrgcGZsNG3CJLoWVl5jTT6RC.jpg";
+const fashionHat = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/imgi_6_501275842_18163243663354922_8740217587413443462_n-kJhMqSmAzVE4LwquvunWAkNbZV11l9.jpg";
+const goldenDress = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/imgi_7_499783517_18504152398016923_8467541026508541721_n-mCo6GmrikLfFeEjKbV589KicBgtOCl.jpg";
+const businessPortrait = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/imgi_15_491433096_17857029396410148_2136071068476210401_n-yM53LdeBpJOZIbkx3ljooLRzptuTjR.jpg";
+const weddingBlackWhite = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/499378474_18502959112016923_4222189175650082913_n-AT8T7MrFalC8V3yUvivUNCLcsX9yGj.jpg";
+
+// Video URLs - blob storage
+const videoWedding1 = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/AQPMZ4lj-H41A0eLEuSObZtqiQvWkEzdrDLhaoKyHZcyI4RS62wNV3z7goCb600n6MDF4ABMiwn1p2SjsFv-WEXQ-WsawCAI1pSvjsZyGUjveUiVEpOBZ6u.mp4";
+const videoFashion1 = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/AQOmEPRv6L07uuSf8D0cUlz2iBGVlGVAnRYLA_06zBEy6kfoq3-qQkxdVJD8Vl-iaVWUKEhRhP5BTft5-MhHUW00EOrvDwd_5qQfqUY-YR5hBfFMduIRHR6pxXGACnZk5TLoZ8.mp4";
+const videoCommercial = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/AQOgPpyddwiFHKAh0RgZ4ywXaD8f2RGv3lx8tPgzUyoylemo7Y5j9-NcU-6zJvnVyRO8Fqq9zu6Ewi9gDqfcnKoMhBgMfKtEvuegTR0-zdRjsi6XP0A09ZAdShWWYDzAweAMks.mp4";
+const videoFashion2 = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/AQNIrmvvVpipCYQw468BnT7zz9unvvTm63j-3pI3Z38i3biZLiiavN4ubNNi7UQpJG0fLvzMHMVtzhPri6Q3ZXOD9WeCxVHg7pZCh-I-0z25MXCrWbYWtR9iAQcP0SZ8EbolAJ.mp4";
+const videoPortrait = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/AQPa0ofiy5wh9oo8aL0dIVPl0vAs4jIAQoSZgyRnVOTrNp3bgt47pl4W4KTyCj9jCpKkGWGQ3e3VbnTbqYjNGfpPpQtbp1ygsdyOf-U-41d3JeIjzeiKa4AC2AUZx391230tM8.mp4";
+const videoEditorial = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/AQOm_ZOWimVwXYaMk7MKNV15uxNkJ2_oKHXsQl4ILhhJaDUjSonnTSnn8PoomYwoH8-3O3rmhBA8DJ4NlHgi_s3hU-dbWjjp8HmPAJg-ewuXNc6LjckrvA6PvAKnqlm2xFql0I.mp4";
+
+// Old fallback imports
 import weddingOutdoor from "@/assets/wedding-outdoor.jpg";
 import weddingIndoor from "@/assets/wedding-indoor.jpg";
-import chefPortrait from "@/assets/chef-portrait.jpg";
-import fashionPortrait from "@/assets/fashion-portrait.jpg";
-import fashionJewelry from "@/assets/fashion-jewelry.jpg";
-import redDressRose from "@/assets/red-dress-rose.jpg";
-import graduationPortrait from "@/assets/graduation-portrait.jpg";
-import blueHatFashion from "@/assets/blue-hat-fashion.jpg";
-import redSuitPink from "@/assets/red-suit-pink.jpg";
-import mysteryHat from "@/assets/mystery-hat.jpg";
-import bridalPortrait from "@/assets/bridal-portrait.jpg";
-import lifestylePortrait from "@/assets/lifestyle-portrait.jpg";
-
-// Videos
-import cinematic1 from "@/assets/videos/cinematic-1.mov";
-import cinematic2 from "@/assets/videos/cinematic-2.mov";
-import cinematic3 from "@/assets/videos/cinematic-3.mov";
 
 // Curated collections with supporting images
 const curatedCollections = [
   {
-    title: "Weddings",
+    title: "Weddings & Love Stories",
     category: "Weddings",
-    description: "Timeless moments of love and celebration captured with cinematic precision. Every frame tells the story of two souls coming together.",
-    frameCount: 48,
-    featuredImage: weddingOutdoor,
+    description: "Timeless moments of love and celebration captured with cinematic precision. From intimate ceremonies to grand celebrations, we document the stories that matter most.",
+    frameCount: 58,
+    featuredImage: weddingBlackWhite,
     supportingImages: [
-      { src: weddingIndoor, title: "Elegant Reception", size: "medium" as const },
-      { src: bridalPortrait, title: "Radiant Bride", size: "small" as const },
-      { src: redDressRose, title: "Romantic Details", size: "small" as const },
+      { src: familyPortrait, title: "Family Moments", size: "large" as const },
+      { src: weddingOutdoor, title: "Golden Hour", size: "small" as const },
+      { src: weddingIndoor, title: "Elegant Reception", size: "small" as const },
     ],
+    allImages: [weddingBlackWhite, familyPortrait, weddingOutdoor, weddingIndoor],
   },
   {
     title: "Fashion & Editorial",
     category: "Fashion",
-    description: "Bold, artistic, and captivating fashion photography that celebrates style and personality. Our editorial work pushes creative boundaries.",
-    frameCount: 52,
-    featuredImage: fashionPortrait,
+    description: "Bold, artistic, and captivating fashion photography that celebrates style and personality. Our editorial work pushes creative boundaries with stunning visuals.",
+    frameCount: 67,
+    featuredImage: turquoiseGown,
     supportingImages: [
-      { src: blueHatFashion, title: "Bold Vision", size: "large" as const },
-      { src: fashionJewelry, title: "Luxury Details", size: "small" as const },
-      { src: redSuitPink, title: "Power & Elegance", size: "small" as const },
+      { src: fashionHat, title: "Bold Vision", size: "large" as const },
+      { src: businessWoman, title: "Professional Elegance", size: "small" as const },
+      { src: goldenDress, title: "Luxury Details", size: "small" as const },
     ],
+    allImages: [turquoiseGown, fashionHat, businessWoman, goldenDress],
   },
   {
     title: "Lifestyle & Portraits",
     category: "Lifestyle",
-    description: "Authentic moments that reveal the essence of life. From personal milestones to everyday beauty, we capture what makes each person unique.",
-    frameCount: 35,
-    featuredImage: lifestylePortrait,
+    description: "Authentic moments that reveal the essence of life. From personal milestones to everyday beauty, we capture what makes each person uniquely themselves.",
+    frameCount: 52,
+    featuredImage: beautyPortrait,
     supportingImages: [
-      { src: graduationPortrait, title: "Milestone Achievement", size: "medium" as const },
-      { src: mysteryHat, title: "Artistic Mystery", size: "small" as const },
-      { src: chefPortrait, title: "Professional Pride", size: "small" as const },
+      { src: chefWhisk, title: "Professional Pride", size: "medium" as const },
+      { src: businessPortrait, title: "Corporate Essence", size: "small" as const },
+      { src: womensDayPoster, title: "Campaign Moments", size: "small" as const },
     ],
+    allImages: [beautyPortrait, chefWhisk, businessPortrait, womensDayPoster],
   },
 ];
 
-const videoShowcase = [
-  { id: 1, src: cinematic1, title: "Timeless Love Stories", description: "Cinematic wedding films that capture emotion and grace" },
-  { id: 2, src: cinematic2, title: "Fashion in Motion", description: "Dynamic editorial videography that brings style to life" },
-  { id: 3, src: cinematic3, title: "Brand Narratives", description: "Commercial storytelling that resonates and inspires" },
+const videoCollections = [
+  { id: 1, src: videoWedding1, title: "Timeless Love Stories", category: "Weddings", description: "Cinematic wedding films that capture emotion and grace" },
+  { id: 2, src: videoFashion1, title: "Fashion in Motion", category: "Fashion", description: "Dynamic editorial videography that brings style to life" },
+  { id: 3, src: videoCommercial, title: "Brand Narratives", category: "Commercial", description: "Commercial storytelling that resonates and inspires" },
+  { id: 4, src: videoFashion2, title: "Editorial Elegance", category: "Fashion", description: "High-fashion cinematography with artistic vision" },
+  { id: 5, src: videoPortrait, title: "Portrait Stories", category: "Lifestyle", description: "Personal moments captured in cinematic detail" },
+  { id: 6, src: videoEditorial, title: "Creative Vision", category: "Editorial", description: "Artistic storytelling through motion and light" },
 ];
 
 const Explore = () => {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [selectedCollection, setSelectedCollection] = useState<any>(null);
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
 
   const filteredCollections = 
     activeCategory === "All"
@@ -81,9 +97,16 @@ const Explore = () => {
 
   const categories = [...new Set(curatedCollections.map(c => c.category))];
 
-  const handleViewCollection = () => {
-    // Placeholder for collection view action
-    console.log("View collection clicked");
+  const handleViewCollection = (collection: any) => {
+    setSelectedCollection({
+      ...collection,
+      images: collection.allImages,
+    });
+  };
+
+  const handleSelectVideo = (video: any) => {
+    setSelectedVideo(video);
+    setShowVideoPlayer(true);
   };
 
   return (
@@ -144,34 +167,35 @@ const Explore = () => {
           {/* Premium Video Player */}
           <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <PremiumVideoPlayer
-              src={videoShowcase[0].src}
-              title={videoShowcase[0].title}
-              description={videoShowcase[0].description}
+              src={videoCollections[0].src}
+              title={videoCollections[0].title}
+              description={videoCollections[0].description}
               className="max-w-5xl mx-auto"
             />
           </div>
 
-          {/* Additional Video Grid */}
+          {/* Additional Featured Videos */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
-            {videoShowcase.slice(1).map((video, index) => (
+            {videoCollections.slice(1, 3).map((video, index) => (
               <div
                 key={video.id}
-                className="group rounded-2xl overflow-hidden animate-fade-in"
+                className="group rounded-2xl overflow-hidden animate-fade-in cursor-pointer"
                 style={{ 
                   aspectRatio: "16/9",
                   animationDelay: `${0.3 + (index + 1) * 0.1}s` 
                 }}
+                onClick={() => handleSelectVideo(video)}
               >
                 <div className="relative w-full h-full">
                   <video
                     src={video.src}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     autoPlay
                     muted
                     loop
                     playsInline
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent group-hover:from-background/90 transition-all duration-300" />
                   <div className="absolute bottom-0 left-0 right-0 p-6">
                     <h3 className="text-2xl font-bold mb-2">{video.title}</h3>
                     <p className="text-muted-foreground">{video.description}</p>
@@ -182,6 +206,14 @@ const Explore = () => {
           </div>
         </div>
       </section>
+
+      {/* Video Collections Grid */}
+      <VideoCollectionGrid
+        videos={videoCollections}
+        onSelectVideo={handleSelectVideo}
+        title="All Video Collections"
+        subtitle="Browse our complete collection of cinematic videography across all categories"
+      />
 
       {/* Collections Section */}
       <section id="collections" className="py-12">
@@ -207,13 +239,67 @@ const Explore = () => {
                 frameCount={collection.frameCount}
                 featuredImage={collection.featuredImage}
                 supportingImages={collection.supportingImages}
-                onViewCollection={handleViewCollection}
+                onViewCollection={() => handleViewCollection(collection)}
                 index={index}
               />
             ))}
           </div>
         </div>
       </section>
+
+      {/* Collection Detail Modal */}
+      {selectedCollection && (
+        <CollectionDetailModal
+          isOpen={!!selectedCollection}
+          onClose={() => setSelectedCollection(null)}
+          collection={selectedCollection}
+        />
+      )}
+
+      {/* Video Player Modal */}
+      {showVideoPlayer && selectedVideo && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-md animate-fade-in"
+          onClick={() => {
+            setShowVideoPlayer(false);
+            setSelectedVideo(null);
+          }}
+        >
+          <div
+            className="relative max-w-2xl w-[90vw] md:w-[70vw]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => {
+                setShowVideoPlayer(false);
+                setSelectedVideo(null);
+              }}
+              className="absolute -top-12 right-0 text-muted-foreground hover:text-foreground transition-colors z-10 text-xl font-bold"
+            >
+              ✕
+            </button>
+            <div
+              className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/30"
+              style={{ aspectRatio: "16/9" }}
+            >
+              <video
+                src={selectedVideo.src}
+                className="w-full h-full object-cover"
+                autoPlay
+                controls
+                playsInline
+              />
+            </div>
+            <div className="mt-6 p-6 bg-secondary/50 rounded-xl">
+              <h3 className="text-2xl font-bold mb-2">{selectedVideo.title}</h3>
+              <p className="text-muted-foreground mb-2">{selectedVideo.description}</p>
+              <span className="inline-block px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-semibold">
+                {selectedVideo.category}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Statistics Section */}
       <section className="py-24 md:py-32 bg-secondary/50 border-t border-border/50">
