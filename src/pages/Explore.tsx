@@ -153,7 +153,39 @@ const Explore = () => {
         </div>
       </section>
 
-      {/* Premium Video Showreel */}
+      {/* Collections Section - Photo Collections First */}
+      <section id="collections" className="py-12">
+        <div className="container mx-auto px-4">
+          {/* Category Filters */}
+          <div className="mb-24 animate-fade-in">
+            <CategoryFilters
+              categories={categories}
+              activeCategory={activeCategory}
+              onCategoryChange={setActiveCategory}
+              className="mb-16"
+            />
+          </div>
+
+          {/* Curated Collections */}
+          <div className="space-y-0">
+            {filteredCollections.map((collection, index) => (
+              <CollectionSection
+                key={collection.title}
+                title={collection.title}
+                category={collection.category}
+                description={collection.description}
+                frameCount={collection.frameCount}
+                featuredImage={collection.featuredImage}
+                supportingImages={collection.supportingImages}
+                onViewCollection={() => handleViewCollection(collection)}
+                index={index}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Premium Video Showreel - Videos After Collections */}
       <section className="py-24 md:py-32">
         <div className="container mx-auto px-4">
           <div className="mb-12 animate-fade-in" style={{ animationDelay: "0.1s" }}>
@@ -214,38 +246,6 @@ const Explore = () => {
         title="All Video Collections"
         subtitle="Browse our complete collection of cinematic videography across all categories"
       />
-
-      {/* Collections Section */}
-      <section id="collections" className="py-12">
-        <div className="container mx-auto px-4">
-          {/* Category Filters */}
-          <div className="mb-24 animate-fade-in">
-            <CategoryFilters
-              categories={categories}
-              activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
-              className="mb-16"
-            />
-          </div>
-
-          {/* Curated Collections */}
-          <div className="space-y-0">
-            {filteredCollections.map((collection, index) => (
-              <CollectionSection
-                key={collection.title}
-                title={collection.title}
-                category={collection.category}
-                description={collection.description}
-                frameCount={collection.frameCount}
-                featuredImage={collection.featuredImage}
-                supportingImages={collection.supportingImages}
-                onViewCollection={() => handleViewCollection(collection)}
-                index={index}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Collection Detail Modal */}
       {selectedCollection && (
