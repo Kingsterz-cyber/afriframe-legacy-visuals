@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroCamera from "@/assets/hero-camera.png.asset.json";
+import heroCamera from "@/assets/hero-camera.jpg";
 
 const trust = [
   { value: "★★★★★", label: "Rated by 200+ clients", star: false },
@@ -55,7 +55,7 @@ const Hero = () => {
         aria-hidden
         className="absolute inset-0 -z-30 bg-cover bg-center-right bg-no-repeat"
         style={{
-          backgroundImage: `url(${heroCamera.url})`,
+          backgroundImage: `url(${heroCamera})`,
           backgroundPosition: "center right",
           transform: reduce
             ? undefined
