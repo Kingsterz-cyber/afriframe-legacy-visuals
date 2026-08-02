@@ -21,7 +21,7 @@ export const PremiumVideoPlayer = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [rotation, setRotation] = useState(0);
-  const controlsTimeoutRef = useRef<NodeJS.Timeout>();
+  const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const handlePlayPause = () => {
     if (videoRef.current) {
