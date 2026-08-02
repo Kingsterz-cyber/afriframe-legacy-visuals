@@ -10,9 +10,10 @@ type Props = {
   value?: Date;
   onSelect: (d: Date) => void;
   isBooked?: (d: Date) => boolean;
+  isUnavailable?: (d: Date) => boolean;
 };
 
-const LuxuryCalendar = ({ value, onSelect, isBooked }: Props) => {
+const LuxuryCalendar = ({ value, onSelect, isBooked, isUnavailable }: Props) => {
   const today = startOfDay(new Date());
   const [cursor, setCursor] = useState(
     new Date((value ?? today).getFullYear(), (value ?? today).getMonth(), 1)
@@ -37,13 +38,17 @@ const LuxuryCalendar = ({ value, onSelect, isBooked }: Props) => {
   const monthLabel = cursor.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
   return (
-    <div className="lux-card w-full max-w-[440px] p-5 md:p-7" role="group" aria-label="Booking calendar">
-      <div className="mb-6 flex items-center justify-between">
+    <div
+      className="glass w-full max-w-[460px] rounded-[26px] p-5 md:p-8"
+      role="group"
+      aria-label="Booking calendar"
+    >
+      <div className="mb-7 flex items-center justify-between">
         <button
           type="button"
           onClick={() => move(-1)}
           aria-label="Previous month"
-          className="grid h-10 w-10 place-items-center rounded-full border border-border transition-all duration-300 hover:border-primary hover:text-primary"
+          className="grid h-11 w-11 place-items-center rounded-full border border-border transition-all duration-300 hover:border-primary hover:text-primary"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -51,11 +56,11 @@ const LuxuryCalendar = ({ value, onSelect, isBooked }: Props) => {
           <AnimatePresence mode="wait" initial={false}>
             <motion.p
               key={monthLabel}
-              initial={{ opacity: 0, y: dir * 10 }}
+              initial={{ opacity: 0, y: dir * 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: dir * -10 }}
+              exit={{ opacity: 0, y: dir * -12 }}
               transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              className="font-display text-lg text-foreground"
+              className="font-display text-xl text-foreground"
             >
               {monthLabel}
             </motion.p>
@@ -65,15 +70,15 @@ const LuxuryCalendar = ({ value, onSelect, isBooked }: Props) => {
           type="button"
           onClick={() => move(1)}
           aria-label="Next month"
-          className="grid h-10 w-10 place-items-center rounded-full border border-border transition-all duration-300 hover:border-primary hover:text-primary"
+          className="grid h-11 w-11 place-items-center rounded-full border border-border transition-all duration-300 hover:border-primary hover:text-primary"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="mb-2 grid grid-cols-7 gap-1 text-center">
+      <div className="mb-3 grid grid-cols-7 gap-1.5 text-center">
         {WEEKDAYS.map((w) => (
-          <span key={w} className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+          <span key={w} className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
             {w}
           </span>
         ))}
@@ -82,17 +87,18 @@ const LuxuryCalendar = ({ value, onSelect, isBooked }: Props) => {
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={monthLabel}
-          initial={{ opacity: 0, filter: "blur(6px)" }}
-          animate={{ opacity: 1, filter: "blur(0px)" }}
-          exit={{ opacity: 0, filter: "blur(6px)" }}
-          transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
-          className="grid grid-cols-7 gap-1"
+          initial={{ opacity: 0, x: dir * 24, filter: "blur(6px)" }}
+          animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, x: dir * -24, filter: "blur(6px)" }}
+          transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          className="grid grid-cols-7 gap-1.5"
         >
           {cells.map((d, i) => {
             if (!d) return <span key={`e${i}`} />;
             const past = d < today;
             const booked = !past && (isBooked?.(d) ?? false);
-            const disabled = past || booked;
+            const closed = !past && !booked && (isUnavailable?.(d) ?? false);
+            const disabled = past || booked || closed;
             const selected = value && startOfDay(value).getTime() === d.getTime();
             const isToday = d.getTime() === today.getTime();
 
@@ -101,37 +107,48 @@ const LuxuryCalendar = ({ value, onSelect, isBooked }: Props) => {
                 key={d.toISOString()}
                 type="button"
                 disabled={disabled}
-                whileHover={disabled ? undefined : { scale: 1.08 }}
+                whileHover={disabled ? undefined : { scale: 1.09, y: -2 }}
                 whileTap={disabled ? undefined : { scale: 0.94 }}
                 onClick={() => onSelect(d)}
-                aria-label={d.toDateString() + (booked ? " (fully booked)" : "")}
+                aria-label={
+                  d.toDateString() +
+                  (booked ? " (fully booked)" : closed ? " (studio closed)" : "")
+                }
                 aria-pressed={selected}
-                className={`numeric relative aspect-square rounded-xl border text-sm transition-colors duration-300 ${
+                className={`numeric relative aspect-square rounded-2xl border text-sm transition-colors duration-300 ${
                   selected
-                    ? "border-primary bg-primary font-semibold text-primary-foreground shadow-[0_10px_28px_hsl(var(--gold)/0.35)]"
+                    ? "border-primary bg-primary font-semibold text-primary-foreground shadow-[0_12px_32px_hsl(var(--gold)/0.35)]"
                     : past
-                      ? "border-transparent text-muted-foreground/35"
+                      ? "border-transparent text-muted-foreground/30"
                       : booked
-                        ? "border-transparent bg-muted text-muted-foreground/60 line-through"
-                        : "border-primary/25 text-foreground hover:border-primary hover:bg-primary/10"
+                        ? "border-transparent bg-muted/60 text-muted-foreground/70"
+                        : closed
+                          ? "border-transparent bg-muted/40 text-muted-foreground/40"
+                          : "border-primary/40 text-foreground hover:border-primary hover:bg-primary/10"
                 } ${isToday && !selected ? "ring-1 ring-primary/60" : ""}`}
               >
                 {d.getDate()}
+                {booked && !selected && (
+                  <span className="absolute bottom-1.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-destructive" />
+                )}
               </motion.button>
             );
           })}
         </motion.div>
       </AnimatePresence>
 
-      <div className="mt-6 flex flex-wrap items-center gap-4 text-[11px] text-muted-foreground">
+      <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-md border border-primary/50" /> Available
+          <span className="h-3 w-3 rounded-md border border-primary/60" /> Available
         </span>
         <span className="flex items-center gap-2">
           <span className="h-3 w-3 rounded-md bg-primary" /> Selected
         </span>
         <span className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-md bg-muted" /> Booked
+          <span className="h-1.5 w-1.5 rounded-full bg-destructive" /> Fully booked
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="h-3 w-3 rounded-md bg-muted" /> Unavailable
         </span>
       </div>
     </div>
