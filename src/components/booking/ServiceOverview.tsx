@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Check, Clock, Film, Sparkles } from "lucide-react";
 import type { Experience } from "@/data/booking";
+import GradientBlobCard from "@/components/ui/gradient-bold-card";
 
 const fade = (i: number) => ({
   initial: { opacity: 0, y: 26 },
@@ -56,52 +57,60 @@ const ServiceOverview = ({
     </motion.p>
 
     <div className="mt-10 grid gap-5 md:grid-cols-2">
-      <motion.div {...fade(2)} className="lux-card p-7">
-        <p className="eyebrow flex items-center gap-2">
-          <Sparkles className="h-3.5 w-3.5" /> {service.includesLabel}
-        </p>
-        <ul className="mt-5 space-y-3">
-          {service.includes.map((x) => (
-            <li key={x} className="flex items-start gap-3 text-sm text-foreground">
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              {x}
-            </li>
-          ))}
-        </ul>
+      <motion.div {...fade(2)}>
+        <GradientBlobCard contentClassName="p-7">
+          <p className="eyebrow flex items-center gap-2">
+            <Sparkles className="h-3.5 w-3.5" /> {service.includesLabel}
+          </p>
+          <ul className="mt-5 space-y-3">
+            {service.includes.map((x) => (
+              <li key={x} className="flex items-start gap-3 text-sm text-foreground">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                {x}
+              </li>
+            ))}
+          </ul>
+        </GradientBlobCard>
       </motion.div>
 
-      <motion.div {...fade(3)} className="lux-card p-7">
-        <p className="eyebrow flex items-center gap-2">
-          <Film className="h-3.5 w-3.5" /> Deliverables
-        </p>
-        <ul className="mt-5 space-y-3">
-          {service.deliverables.map((x) => (
-            <li key={x} className="flex items-start gap-3 text-sm text-foreground">
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              {x}
-            </li>
-          ))}
-        </ul>
-        <div className="gold-rule my-6" />
-        <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Clock className="h-4 w-4 text-primary" />
-          <span className="numeric">{service.duration}</span>
-        </p>
+      <motion.div {...fade(3)}>
+        <GradientBlobCard contentClassName="p-7">
+          <p className="eyebrow flex items-center gap-2">
+            <Film className="h-3.5 w-3.5" /> Deliverables
+          </p>
+          <ul className="mt-5 space-y-3">
+            {service.deliverables.map((x) => (
+              <li key={x} className="flex items-start gap-3 text-sm text-foreground">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                {x}
+              </li>
+            ))}
+          </ul>
+          <div className="gold-rule my-6" />
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock className="h-4 w-4 text-primary" />
+            <span className="numeric">{service.duration}</span>
+          </p>
+        </GradientBlobCard>
       </motion.div>
     </div>
 
     {/* Workflow */}
-    <motion.div {...fade(4)} className="mt-5 lux-card p-7">
-      <p className="eyebrow">How It Works</p>
-      <ol className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {service.workflow.map((w, i) => (
-          <li key={w} className="relative">
-            <span className="numeric text-3xl text-primary/40">0{i + 1}</span>
-            <p className="mt-2 text-sm text-foreground">{w}</p>
-          </li>
-        ))}
-      </ol>
+    <motion.div {...fade(4)} className="mt-5">
+      <GradientBlobCard contentClassName="p-7">
+        <p className="eyebrow">How It Works</p>
+        <ol className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {service.workflow.map((w, i) => (
+            <li key={w} className="relative">
+              <span className="numeric text-3xl text-primary/40">0{i + 1}</span>
+              <p className="mt-2 text-sm text-foreground">{w}</p>
+            </li>
+          ))}
+        </ol>
+      </GradientBlobCard>
     </motion.div>
+
+
 
     {/* Gallery */}
     {service.gallery.length > 0 && (

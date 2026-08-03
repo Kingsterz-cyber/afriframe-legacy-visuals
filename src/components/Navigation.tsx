@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Aperture } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import logo from "@/assets/afriframe-logo.png";
+
 
 const links = [
   { label: "Home", to: "/" },
@@ -34,11 +36,16 @@ const Navigation = () => {
         aria-label="Main"
       >
         <Link to="/" className="flex items-center gap-3">
-          <Aperture className="h-6 w-6 text-primary" strokeWidth={1.4} />
+          <img
+            src={logo}
+            alt="Afriframe Studio logo"
+            className="h-9 w-9 rounded-[10px] object-cover"
+          />
           <span className="font-cinzel text-sm uppercase tracking-[0.28em] text-foreground">
             Afriframe
           </span>
         </Link>
+
 
         <div className="hidden items-center gap-9 lg:flex">
           {links.map((l) => (
