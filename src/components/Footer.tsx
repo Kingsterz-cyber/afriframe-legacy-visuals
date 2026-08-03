@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowUp, Instagram, Youtube, Facebook } from "lucide-react";
-import logo from "@/assets/afriframe-logo.png.asset.json";
+import logo from "@/assets/afriframe-logo.png";
 
 const columns = [
   {
@@ -41,7 +41,7 @@ const Footer = () => (
         <div>
           <div className="flex items-center gap-3">
             <img
-              src={logo.url}
+              src={logo}
               alt="Afriframe Studio logo"
               className="h-9 w-9 rounded-[10px] object-cover"
             />

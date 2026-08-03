@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
-import logo from "@/assets/afriframe-logo.png.asset.json";
+import logo from "@/assets/afriframe-logo.png";
 
 
 const links = [
@@ -37,7 +37,7 @@ const Navigation = () => {
       >
         <Link to="/" className="flex items-center gap-3">
           <img
-            src={logo.url}
+            src={logo}
             alt="Afriframe Studio logo"
             className="h-9 w-9 rounded-[10px] object-cover"
           />
