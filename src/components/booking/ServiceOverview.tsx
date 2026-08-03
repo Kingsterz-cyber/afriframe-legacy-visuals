@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Check, Clock, Film, Sparkles } from "lucide-react";
 import type { Experience } from "@/data/booking";
+import GradientBlobCard from "@/components/ui/gradient-bold-card";
 
 const fade = (i: number) => ({
   initial: { opacity: 0, y: 26 },
@@ -110,18 +111,6 @@ const ServiceOverview = ({
     </motion.div>
 
 
-    {/* Workflow */}
-    <motion.div {...fade(4)} className="mt-5 lux-card p-7">
-      <p className="eyebrow">How It Works</p>
-      <ol className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {service.workflow.map((w, i) => (
-          <li key={w} className="relative">
-            <span className="numeric text-3xl text-primary/40">0{i + 1}</span>
-            <p className="mt-2 text-sm text-foreground">{w}</p>
-          </li>
-        ))}
-      </ol>
-    </motion.div>
 
     {/* Gallery */}
     {service.gallery.length > 0 && (
