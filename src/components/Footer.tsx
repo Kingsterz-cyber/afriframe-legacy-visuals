@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Aperture, ArrowUp, Instagram, Youtube, Facebook } from "lucide-react";
+import { ArrowUp, Instagram, Youtube, Facebook } from "lucide-react";
+import logo from "@/assets/afriframe-logo.png.asset.json";
 
 const columns = [
   {
