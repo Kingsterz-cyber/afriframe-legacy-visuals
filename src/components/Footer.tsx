@@ -39,9 +39,14 @@ const Footer = () => (
       <div className="grid gap-12 lg:grid-cols-[minmax(0,36%)_1fr]">
         <div>
           <div className="flex items-center gap-3">
-            <Aperture className="h-6 w-6 text-primary" strokeWidth={1.4} />
+            <img
+              src={logo.url}
+              alt="Afriframe Studio logo"
+              className="h-9 w-9 rounded-[10px] object-cover"
+            />
             <span className="font-cinzel text-sm uppercase tracking-[0.28em]">Afriframe Studio</span>
           </div>
+
           <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
             Luxury photography and cinematic storytelling. Moments, preserved beautifully — from
             Kigali to wherever your story unfolds.
