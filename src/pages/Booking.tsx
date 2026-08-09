@@ -215,9 +215,10 @@ const Booking = () => {
     setSubmitting(false);
 
     if (!result.ok) {
-      toast.error(result.message);
+      toast.error(result.message ?? "We couldn't complete your booking. Please try again.");
       return;
     }
+
 
     setReference(
       result.bookingId
