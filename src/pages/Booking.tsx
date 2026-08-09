@@ -15,15 +15,9 @@ import {
   FloatingSelect,
   FloatingTextarea,
 } from "@/components/booking/FloatingField";
-import {
-  budgetRanges,
-  experiences,
-  isDateBooked,
-  isDateUnavailable,
-  mediumOptions,
-  projectTypes,
-  slotsForDate,
-} from "@/data/booking";
+import { budgetRanges, mediumOptions, projectTypes } from "@/data/booking";
+import { submitBooking, toDateKey, useBookingBackend } from "@/hooks/useBookingBackend";
+
 
 type Details = {
   name: string;
