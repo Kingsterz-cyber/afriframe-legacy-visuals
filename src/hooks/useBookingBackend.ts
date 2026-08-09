@@ -224,7 +224,7 @@ const friendlyError = (raw: string) => {
 /** Creates/reuses the client record, then books through the create_booking RPC. */
 export const submitBooking = async (
   input: BookingSubmission
-): Promise<{ ok: true; bookingId: string } | { ok: false; message: string }> => {
+): Promise<{ ok: boolean; bookingId?: string; message?: string }> => {
   const email = input.email.trim().toLowerCase();
 
   try {
