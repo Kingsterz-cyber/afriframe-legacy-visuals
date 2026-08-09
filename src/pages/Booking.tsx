@@ -15,15 +15,9 @@ import {
   FloatingSelect,
   FloatingTextarea,
 } from "@/components/booking/FloatingField";
-import {
-  budgetRanges,
-  experiences,
-  isDateBooked,
-  isDateUnavailable,
-  mediumOptions,
-  projectTypes,
-  slotsForDate,
-} from "@/data/booking";
+import { budgetRanges, mediumOptions, projectTypes } from "@/data/booking";
+import { submitBooking, toDateKey, useBookingBackend } from "@/hooks/useBookingBackend";
+
 
 type Details = {
   name: string;
@@ -114,9 +108,21 @@ const Booking = () => {
   const [reference, setReference] = useState("");
   const topRef = useRef<HTMLDivElement>(null);
 
-  const service = experiences.find((s) => s.id === serviceId);
+  const {
+    services,
+    loadingServices,
+    dayFor,
+    isDateBooked,
+    isDateUnavailable,
+    slotsForDate,
+    refreshAvailability,
+  } = useBookingBackend();
+
+  const service = services.find((s) => s.id === serviceId);
   const isCustom = !!service?.featured;
   const slots = date ? slotsForDate(date) : [];
+  const capacity = date ? dayFor(date) : undefined;
+
 
   const set = (k: keyof Details) => (v: string) => {
     setDetails((d) => ({ ...d, [k]: v }));
@@ -168,12 +174,60 @@ const Booking = () => {
   };
 
   const confirm = async () => {
+    if (submitting) return;
+    if (!service || !date || !slot) {
+      toast.error("Please complete your date and time selection.");
+      return;
+    }
+
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1400));
-    setReference(`AFR-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
+
+    const notes = isCustom
+      ? [
+          details.projectName && `Project: ${details.projectName}`,
+          details.projectType && `Type: ${details.projectType}`,
+          details.medium && `Medium: ${details.medium}`,
+          details.budget && `Budget: ${details.budget}`,
+          details.location && `Location: ${details.location}`,
+          details.vision && `Vision: ${details.vision}`,
+        ]
+          .filter(Boolean)
+          .join("\n")
+      : [
+          details.location && `Location: ${details.location}`,
+          details.address && `Address: ${details.address}`,
+          details.notes && `Notes: ${details.notes}`,
+        ]
+          .filter(Boolean)
+          .join("\n");
+
+    const result = await submitBooking({
+      serviceId: service.dbId,
+      date,
+      time: slot,
+      fullName: details.name,
+      email: details.email,
+      phone: details.phone,
+      message: notes,
+    });
+
+    await refreshAvailability();
     setSubmitting(false);
+
+    if (!result.ok) {
+      toast.error(result.message ?? "We couldn't complete your booking. Please try again.");
+      return;
+    }
+
+
+    setReference(
+      result.bookingId
+        ? `AFR-${result.bookingId.slice(0, 8).toUpperCase()}`
+        : `AFR-${new Date().getFullYear()}-${toDateKey(date).replace(/-/g, "")}`
+    );
     goTo(6, 1);
   };
+
 
   const reset = () => {
     setServiceId(undefined);
@@ -295,19 +349,26 @@ const Booking = () => {
               {/* STEP 1 — SERVICE SELECTION */}
               {step === 0 && (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {experiences.map((s, i) => (
-                    <ServiceCard
-                      key={s.id}
-                      service={s}
-                      index={i}
-                      onSelect={() => {
-                        setServiceId(s.id);
-                        setDir(1);
-                        setStep(1);
-                        scrollTop();
-                      }}
-                    />
-                  ))}
+                  {loadingServices
+                    ? Array.from({ length: 6 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className="h-[440px] animate-pulse rounded-[26px] border border-border bg-card/60"
+                        />
+                      ))
+                    : services.map((s, i) => (
+                        <ServiceCard
+                          key={s.id}
+                          service={s}
+                          index={i}
+                          onSelect={() => {
+                            setServiceId(s.id);
+                            setDir(1);
+                            setStep(1);
+                            scrollTop();
+                          }}
+                        />
+                      ))}
                 </div>
               )}
 
@@ -341,11 +402,34 @@ const Booking = () => {
                     <p className="mt-2 font-display text-2xl text-foreground md:text-3xl">
                       {dateLabel}
                     </p>
+
+                    {capacity && (
+                      <div className="mt-5 flex flex-wrap gap-x-7 gap-y-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                        <span>
+                          Maximum <span className="numeric text-foreground">{capacity.maxBookings}</span>
+                        </span>
+                        <span>
+                          Booked <span className="numeric text-foreground">{capacity.booked}</span>
+                        </span>
+                        <span>
+                          Remaining{" "}
+                          <span className="numeric text-primary">{capacity.remaining}</span>
+                        </span>
+                      </div>
+                    )}
+
                     <div className="gold-rule my-8" />
-                    <TimeSlotSelector slots={slots} value={slot} onSelect={setSlot} />
+                    {slots.length ? (
+                      <TimeSlotSelector slots={slots} value={slot} onSelect={setSlot} />
+                    ) : (
+                      <p className="text-sm italic text-muted-foreground">
+                        No times are open for this date. Please choose another date.
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
+
 
               {/* STEP 5 — DETAILS */}
               {step === 4 && (
