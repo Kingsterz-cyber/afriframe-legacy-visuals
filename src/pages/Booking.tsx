@@ -174,12 +174,59 @@ const Booking = () => {
   };
 
   const confirm = async () => {
+    if (submitting) return;
+    if (!service || !date || !slot) {
+      toast.error("Please complete your date and time selection.");
+      return;
+    }
+
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1400));
-    setReference(`AFR-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
+
+    const notes = isCustom
+      ? [
+          details.projectName && `Project: ${details.projectName}`,
+          details.projectType && `Type: ${details.projectType}`,
+          details.medium && `Medium: ${details.medium}`,
+          details.budget && `Budget: ${details.budget}`,
+          details.location && `Location: ${details.location}`,
+          details.vision && `Vision: ${details.vision}`,
+        ]
+          .filter(Boolean)
+          .join("\n")
+      : [
+          details.location && `Location: ${details.location}`,
+          details.address && `Address: ${details.address}`,
+          details.notes && `Notes: ${details.notes}`,
+        ]
+          .filter(Boolean)
+          .join("\n");
+
+    const result = await submitBooking({
+      serviceId: service.dbId,
+      date,
+      time: slot,
+      fullName: details.name,
+      email: details.email,
+      phone: details.phone,
+      message: notes,
+    });
+
+    await refreshAvailability();
     setSubmitting(false);
+
+    if (!result.ok) {
+      toast.error(result.message);
+      return;
+    }
+
+    setReference(
+      result.bookingId
+        ? `AFR-${result.bookingId.slice(0, 8).toUpperCase()}`
+        : `AFR-${new Date().getFullYear()}-${toDateKey(date).replace(/-/g, "")}`
+    );
     goTo(6, 1);
   };
+
 
   const reset = () => {
     setServiceId(undefined);
