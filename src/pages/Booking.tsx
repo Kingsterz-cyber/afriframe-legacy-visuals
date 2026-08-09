@@ -108,9 +108,21 @@ const Booking = () => {
   const [reference, setReference] = useState("");
   const topRef = useRef<HTMLDivElement>(null);
 
-  const service = experiences.find((s) => s.id === serviceId);
+  const {
+    services,
+    loadingServices,
+    dayFor,
+    isDateBooked,
+    isDateUnavailable,
+    slotsForDate,
+    refreshAvailability,
+  } = useBookingBackend();
+
+  const service = services.find((s) => s.id === serviceId);
   const isCustom = !!service?.featured;
   const slots = date ? slotsForDate(date) : [];
+  const capacity = date ? dayFor(date) : undefined;
+
 
   const set = (k: keyof Details) => (v: string) => {
     setDetails((d) => ({ ...d, [k]: v }));
