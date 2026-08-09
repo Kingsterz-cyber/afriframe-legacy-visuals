@@ -301,19 +301,26 @@ const Booking = () => {
               {/* STEP 1 — SERVICE SELECTION */}
               {step === 0 && (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {experiences.map((s, i) => (
-                    <ServiceCard
-                      key={s.id}
-                      service={s}
-                      index={i}
-                      onSelect={() => {
-                        setServiceId(s.id);
-                        setDir(1);
-                        setStep(1);
-                        scrollTop();
-                      }}
-                    />
-                  ))}
+                  {loadingServices
+                    ? Array.from({ length: 6 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className="h-[440px] animate-pulse rounded-[26px] border border-border bg-card/60"
+                        />
+                      ))
+                    : services.map((s, i) => (
+                        <ServiceCard
+                          key={s.id}
+                          service={s}
+                          index={i}
+                          onSelect={() => {
+                            setServiceId(s.id);
+                            setDir(1);
+                            setStep(1);
+                            scrollTop();
+                          }}
+                        />
+                      ))}
                 </div>
               )}
 
@@ -347,11 +354,34 @@ const Booking = () => {
                     <p className="mt-2 font-display text-2xl text-foreground md:text-3xl">
                       {dateLabel}
                     </p>
+
+                    {capacity && (
+                      <div className="mt-5 flex flex-wrap gap-x-7 gap-y-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                        <span>
+                          Maximum <span className="numeric text-foreground">{capacity.maxBookings}</span>
+                        </span>
+                        <span>
+                          Booked <span className="numeric text-foreground">{capacity.booked}</span>
+                        </span>
+                        <span>
+                          Remaining{" "}
+                          <span className="numeric text-primary">{capacity.remaining}</span>
+                        </span>
+                      </div>
+                    )}
+
                     <div className="gold-rule my-8" />
-                    <TimeSlotSelector slots={slots} value={slot} onSelect={setSlot} />
+                    {slots.length ? (
+                      <TimeSlotSelector slots={slots} value={slot} onSelect={setSlot} />
+                    ) : (
+                      <p className="text-sm italic text-muted-foreground">
+                        No times are open for this date. Please choose another date.
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
+
 
               {/* STEP 5 — DETAILS */}
               {step === 4 && (
