@@ -111,7 +111,9 @@ const Booking = () => {
   const {
     services,
     loadingServices,
+    loadingAvailability,
     dayFor,
+    isDateSelectable,
     isDateBooked,
     isDateUnavailable,
     slotsForDate,
@@ -122,6 +124,18 @@ const Booking = () => {
   const isCustom = !!service?.featured;
   const slots = date ? slotsForDate(date) : [];
   const capacity = date ? dayFor(date) : undefined;
+
+  // Admin changes and booking/cancellation events arrive through the existing
+  // realtime subscription. Never retain a date after its source-of-truth state
+  // changes from available to blocked or fully booked.
+  useEffect(() => {
+    if (!loadingAvailability && date && !isDateSelectable(date)) {
+      setDate(undefined);
+      setSlot(undefined);
+      if (step > 2 && step < 6) setStep(2);
+      toast.error("That date is no longer available. Please choose another date.");
+    }
+  }, [date, isDateSelectable, loadingAvailability, step]);
 
 
   const set = (k: keyof Details) => (v: string) => {
