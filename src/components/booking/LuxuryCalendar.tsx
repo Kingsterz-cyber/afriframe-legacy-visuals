@@ -96,9 +96,11 @@ const LuxuryCalendar = ({ value, onSelect, isBooked, isUnavailable }: Props) => 
           {cells.map((d, i) => {
             if (!d) return <span key={`e${i}`} />;
             const past = d < today;
-            const booked = !past && (isBooked?.(d) ?? false);
-            const closed = !past && !booked && (isUnavailable?.(d) ?? false);
+            // Priority: past → blocked → fully booked → available (selected is UI-only).
+            const closed = !past && (isUnavailable?.(d) ?? false);
+            const booked = !past && !closed && (isBooked?.(d) ?? false);
             const disabled = past || booked || closed;
+
             const selected = value && startOfDay(value).getTime() === d.getTime();
             const isToday = d.getTime() === today.getTime();
 

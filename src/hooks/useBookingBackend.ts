@@ -41,6 +41,10 @@ export type DayAvailability = {
   notes: string | null;
 };
 
+/** Calendar status priority: blocked → booked → available. */
+export type DateStatus = "available" | "booked" | "blocked";
+
+
 export const useBookingBackend = () => {
   const [services, setServices] = useState<BookingService[]>([]);
   const [loadingServices, setLoadingServices] = useState(true);
@@ -61,17 +65,13 @@ export const useBookingBackend = () => {
   }, []);
 
   const loadAvailability = useCallback(async () => {
-    const from = toDateKey(new Date());
+    // Load the full availability table (admin source of truth) and every active
+    // booking — no date window, so past/other months resolve correctly too.
     const [availRes, bookingsRes] = await Promise.all([
-      afriframe
-        .from("availability")
-        .select("*")
-        .gte("date", from)
-        .order("date", { ascending: true }),
+      afriframe.from("availability").select("*").order("date", { ascending: true }),
       afriframe
         .from("bookings")
         .select("booking_date,status")
-        .gte("booking_date", from)
         .in("status", ["pending", "confirmed"]),
     ]);
 
@@ -80,15 +80,19 @@ export const useBookingBackend = () => {
 
     const counts: Record<string, number> = {};
     for (const b of (bookingsRes.data as { booking_date: string }[]) ?? []) {
-      counts[b.booking_date] = (counts[b.booking_date] ?? 0) + 1;
+      // booking_date is a DATE string (YYYY-MM-DD) — used as-is, never parsed to Date.
+      const key = String(b.booking_date).slice(0, 10);
+      counts[key] = (counts[key] ?? 0) + 1;
     }
 
     const next: Record<string, DayAvailability> = {};
     for (const row of (availRes.data as DbAvailability[]) ?? []) {
+      const key = String(row.date).slice(0, 10);
       const slots = Array.isArray(row.time_slots) ? row.time_slots.map(String) : [];
-      const maxBookings = row.max_bookings ?? 0;
-      const booked = counts[row.date] ?? 0;
-      next[row.date] = {
+      // Capacity: explicit max_bookings when set, otherwise the number of slots.
+      const maxBookings = row.max_bookings && row.max_bookings > 0 ? row.max_bookings : slots.length;
+      const booked = counts[key] ?? 0;
+      next[key] = {
         available: !!row.available,
         maxBookings,
         booked,
@@ -100,6 +104,7 @@ export const useBookingBackend = () => {
     setAvailability(next);
     setLoadingAvailability(false);
   }, []);
+
 
   useEffect(() => {
     loadServices();
@@ -131,32 +136,31 @@ export const useBookingBackend = () => {
     [availability]
   );
 
-  const isDateSelectable = useCallback(
-    (d: Date) => {
+  /**
+   * Single source of truth for a date's status.
+   * Priority: blocked → fully booked → available.
+   * A date with no availability row is not open for booking (the admin calendar
+   * only opens dates it has explicitly configured), so it renders as blocked.
+   */
+  const statusFor = useCallback(
+    (d: Date): DateStatus => {
       const day = dayFor(d);
-      return !!day && day.available && day.remaining > 0 && day.slots.length > 0;
+      if (!day) return "blocked";
+      if (!day.available || day.slots.length === 0) return "blocked";
+      if (day.remaining <= 0) return "booked";
+      return "available";
     },
     [dayFor]
   );
 
-  /** Fully booked: configured + available but no capacity left (red dot). */
-  const isDateBooked = useCallback(
-    (d: Date) => {
-      const day = dayFor(d);
-      return !!day && day.available && day.remaining <= 0;
-    },
-    [dayFor]
-  );
+  const isDateSelectable = useCallback((d: Date) => statusFor(d) === "available", [statusFor]);
 
-  /** Not configured, blocked by admin, or no slots (gray). */
-  const isDateUnavailable = useCallback(
-    (d: Date) => {
-      const day = dayFor(d);
-      if (!day) return true;
-      return !day.available || day.slots.length === 0;
-    },
-    [dayFor]
-  );
+  /** Fully booked: available date whose capacity is consumed (red dot). */
+  const isDateBooked = useCallback((d: Date) => statusFor(d) === "booked", [statusFor]);
+
+  /** Blocked by admin or not configured (gray). */
+  const isDateUnavailable = useCallback((d: Date) => statusFor(d) === "blocked", [statusFor]);
+
 
   const slotsForDate = useCallback(
     (d: Date) => {
@@ -175,6 +179,7 @@ export const useBookingBackend = () => {
       availability,
       loadingAvailability,
       dayFor,
+      statusFor,
       isDateSelectable,
       isDateBooked,
       isDateUnavailable,
@@ -187,6 +192,7 @@ export const useBookingBackend = () => {
       availability,
       loadingAvailability,
       dayFor,
+      statusFor,
       isDateSelectable,
       isDateBooked,
       isDateUnavailable,
@@ -195,6 +201,7 @@ export const useBookingBackend = () => {
     ]
   );
 };
+
 
 export type BookingSubmission = {
   serviceId: string;
