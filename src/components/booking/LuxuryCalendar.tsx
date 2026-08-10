@@ -101,7 +101,11 @@ const LuxuryCalendar = ({ value, onSelect, isBooked, isUnavailable }: Props) => 
             const booked = !past && !closed && (isBooked?.(d) ?? false);
             const disabled = past || booked || closed;
 
-            const selected = value && startOfDay(value).getTime() === d.getTime();
+            // Selection is only a visual layer on a currently bookable date. If
+            // realtime data blocks/fills the selected date, its underlying state
+            // must win immediately instead of leaving a misleading gold selection.
+            const selected =
+              !disabled && !!value && startOfDay(value).getTime() === d.getTime();
             const isToday = d.getTime() === today.getTime();
 
             return (
@@ -144,13 +148,13 @@ const LuxuryCalendar = ({ value, onSelect, isBooked, isUnavailable }: Props) => 
           <span className="h-3 w-3 rounded-md border border-primary/60" /> Available
         </span>
         <span className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-md bg-primary" /> Selected
-        </span>
-        <span className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-destructive" /> Fully booked
         </span>
         <span className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-md bg-muted" /> Unavailable
+          <span className="h-3 w-3 rounded-md bg-muted" /> Unavailable / Blocked
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="h-3 w-3 rounded-md bg-primary" /> Selected
         </span>
       </div>
     </div>
