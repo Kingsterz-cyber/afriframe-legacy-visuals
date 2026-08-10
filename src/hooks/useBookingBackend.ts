@@ -179,6 +179,7 @@ export const useBookingBackend = () => {
       availability,
       loadingAvailability,
       dayFor,
+      statusFor,
       isDateSelectable,
       isDateBooked,
       isDateUnavailable,
@@ -191,6 +192,7 @@ export const useBookingBackend = () => {
       availability,
       loadingAvailability,
       dayFor,
+      statusFor,
       isDateSelectable,
       isDateBooked,
       isDateUnavailable,
@@ -199,6 +201,7 @@ export const useBookingBackend = () => {
     ]
   );
 };
+
 
 export type BookingSubmission = {
   serviceId: string;
