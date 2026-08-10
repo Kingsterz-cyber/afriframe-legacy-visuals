@@ -219,21 +219,6 @@ export const experiences: Experience[] = [
 
 export const timeSlots = ["09:00", "10:30", "12:00", "14:00", "16:30", "18:00"];
 
-/** Deterministic mock availability — frontend only. */
-export const slotsForDate = (date: Date) => {
-  const seed = date.getDate() + date.getMonth();
-  return timeSlots.map((time, i) => ({
-    time,
-    available: (seed + i * 3) % 4 !== 0,
-  }));
-};
-
-/** Fully booked days (red dot). */
-export const isDateBooked = (date: Date) => (date.getDate() + date.getMonth()) % 7 === 3;
-
-/** Studio closed days (gray). */
-export const isDateUnavailable = (date: Date) => date.getDay() === 0;
-
 export const projectTypes = [
   "Destination Shoot",
   "Creative Campaign",
