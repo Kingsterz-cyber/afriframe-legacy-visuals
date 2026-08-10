@@ -61,17 +61,13 @@ export const useBookingBackend = () => {
   }, []);
 
   const loadAvailability = useCallback(async () => {
-    const from = toDateKey(new Date());
+    // Load the full availability table (admin source of truth) and every active
+    // booking — no date window, so past/other months resolve correctly too.
     const [availRes, bookingsRes] = await Promise.all([
-      afriframe
-        .from("availability")
-        .select("*")
-        .gte("date", from)
-        .order("date", { ascending: true }),
+      afriframe.from("availability").select("*").order("date", { ascending: true }),
       afriframe
         .from("bookings")
         .select("booking_date,status")
-        .gte("booking_date", from)
         .in("status", ["pending", "confirmed"]),
     ]);
 
@@ -80,15 +76,19 @@ export const useBookingBackend = () => {
 
     const counts: Record<string, number> = {};
     for (const b of (bookingsRes.data as { booking_date: string }[]) ?? []) {
-      counts[b.booking_date] = (counts[b.booking_date] ?? 0) + 1;
+      // booking_date is a DATE string (YYYY-MM-DD) — used as-is, never parsed to Date.
+      const key = String(b.booking_date).slice(0, 10);
+      counts[key] = (counts[key] ?? 0) + 1;
     }
 
     const next: Record<string, DayAvailability> = {};
     for (const row of (availRes.data as DbAvailability[]) ?? []) {
+      const key = String(row.date).slice(0, 10);
       const slots = Array.isArray(row.time_slots) ? row.time_slots.map(String) : [];
-      const maxBookings = row.max_bookings ?? 0;
-      const booked = counts[row.date] ?? 0;
-      next[row.date] = {
+      // Capacity: explicit max_bookings when set, otherwise the number of slots.
+      const maxBookings = row.max_bookings && row.max_bookings > 0 ? row.max_bookings : slots.length;
+      const booked = counts[key] ?? 0;
+      next[key] = {
         available: !!row.available,
         maxBookings,
         booked,
@@ -100,6 +100,7 @@ export const useBookingBackend = () => {
     setAvailability(next);
     setLoadingAvailability(false);
   }, []);
+
 
   useEffect(() => {
     loadServices();
