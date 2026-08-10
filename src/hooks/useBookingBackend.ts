@@ -41,6 +41,10 @@ export type DayAvailability = {
   notes: string | null;
 };
 
+/** Calendar status priority: blocked → booked → available. */
+export type DateStatus = "available" | "booked" | "blocked";
+
+
 export const useBookingBackend = () => {
   const [services, setServices] = useState<BookingService[]>([]);
   const [loadingServices, setLoadingServices] = useState(true);
