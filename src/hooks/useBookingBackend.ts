@@ -44,6 +44,23 @@ export type DayAvailability = {
 /** Calendar status priority: blocked → booked → available. */
 export type DateStatus = "available" | "booked" | "blocked";
 
+/** System defaults used when the admin has NOT configured a date. */
+const DEFAULT_CAPACITY = 3;
+const DEFAULT_SLOTS = ["09:00", "12:00", "14:00", "16:00"];
+
+/** Row shape returned by the backend's public availability RPC. */
+type CalendarRow = {
+  date: string;
+  capacity: number | null;
+  booking_count: number | null;
+  is_override: boolean | null;
+  status: string | null;
+};
+
+const shiftMonth = (delta: number) => {
+  const n = new Date();
+  return new Date(n.getFullYear(), n.getMonth() + delta, 1);
+};
 
 export const useBookingBackend = () => {
   const [services, setServices] = useState<BookingService[]>([]);
@@ -65,42 +82,53 @@ export const useBookingBackend = () => {
   }, []);
 
   const loadAvailability = useCallback(async () => {
-    // Load the full availability table (admin source of truth) and every active
-    // booking — no date window, so past/other months resolve correctly too.
-    const [availRes, bookingsRes] = await Promise.all([
-      afriframe.from("availability").select("*").order("date", { ascending: true }),
-      afriframe
-        .from("bookings")
-        .select("booking_date,status")
-        .in("status", ["pending", "confirmed"]),
+    // Source of truth = the backend's availability RPC. It already applies
+    // "default open, capacity 3" for unconfigured dates, layers admin overrides
+    // on top, and returns booking counts WITHOUT exposing any client data.
+    const start = toDateKey(shiftMonth(-1));
+    const end = toDateKey(shiftMonth(19));
+
+    const [calendarRes, availRes] = await Promise.all([
+      afriframe.rpc("get_availability_calendar", { p_start: start, p_end: end }),
+      // Only used for admin time-slot / notes overrides; never for open/closed state.
+      afriframe.from("availability").select("*"),
     ]);
 
+    if (calendarRes.error) console.error("[booking] calendar load failed:", calendarRes.error);
     if (availRes.error) console.error("[booking] availability load failed:", availRes.error);
-    if (bookingsRes.error) console.error("[booking] bookings load failed:", bookingsRes.error);
 
-    const counts: Record<string, number> = {};
-    for (const b of (bookingsRes.data as { booking_date: string }[]) ?? []) {
-      // booking_date is a DATE string (YYYY-MM-DD) — used as-is, never parsed to Date.
-      const key = String(b.booking_date).slice(0, 10);
-      counts[key] = (counts[key] ?? 0) + 1;
+    const overrides: Record<string, DbAvailability> = {};
+    for (const row of (availRes.data as DbAvailability[]) ?? []) {
+      overrides[String(row.date).slice(0, 10)] = row;
     }
 
     const next: Record<string, DayAvailability> = {};
-    for (const row of (availRes.data as DbAvailability[]) ?? []) {
+    for (const row of (calendarRes.data as CalendarRow[]) ?? []) {
+      // Dates are DATE strings (YYYY-MM-DD) and are never parsed into a Date,
+      // so no UTC conversion can shift a day.
       const key = String(row.date).slice(0, 10);
-      const slots = Array.isArray(row.time_slots) ? row.time_slots.map(String) : [];
-      // Capacity: explicit max_bookings when set, otherwise the number of slots.
-      const maxBookings = row.max_bookings && row.max_bookings > 0 ? row.max_bookings : slots.length;
-      const booked = counts[key] ?? 0;
+      const status = (row.status ?? "").toLowerCase();
+      const override = overrides[key];
+      const slots =
+        override && Array.isArray(override.time_slots) && override.time_slots.length > 0
+          ? override.time_slots.map(String)
+          : DEFAULT_SLOTS;
+
+      const maxBookings =
+        row.capacity && row.capacity > 0 ? Number(row.capacity) : DEFAULT_CAPACITY;
+      const booked = Math.max(0, Number(row.booking_count ?? 0));
+      const blocked = status === "blocked" || status === "unavailable";
+
       next[key] = {
-        available: !!row.available,
+        available: !blocked,
         maxBookings,
         booked,
         remaining: Math.max(0, maxBookings - booked),
         slots,
-        notes: row.notes,
+        notes: override?.notes ?? null,
       };
     }
+
     setAvailability(next);
     setLoadingAvailability(false);
   }, []);
@@ -131,22 +159,33 @@ export const useBookingBackend = () => {
     };
   }, [loadAvailability, loadServices]);
 
+  /**
+   * Every upcoming date resolves to a day record. Dates the backend did not
+   * return (outside the fetched window) fall back to the system default so the
+   * client never shows a future date as unavailable just because no row exists.
+   */
   const dayFor = useCallback(
-    (d: Date): DayAvailability | undefined => availability[toDateKey(d)],
+    (d: Date): DayAvailability | undefined =>
+      availability[toDateKey(d)] ?? {
+        available: true,
+        maxBookings: DEFAULT_CAPACITY,
+        booked: 0,
+        remaining: DEFAULT_CAPACITY,
+        slots: DEFAULT_SLOTS,
+        notes: null,
+      },
     [availability]
   );
 
   /**
    * Single source of truth for a date's status.
-   * Priority: blocked → fully booked → available.
-   * A date with no availability row is not open for booking (the admin calendar
-   * only opens dates it has explicitly configured), so it renders as blocked.
+   * Priority: admin block → fully booked → available.
    */
   const statusFor = useCallback(
     (d: Date): DateStatus => {
       const day = dayFor(d);
-      if (!day) return "blocked";
-      if (!day.available || day.slots.length === 0) return "blocked";
+      if (!day) return "available";
+      if (!day.available) return "blocked";
       if (day.remaining <= 0) return "booked";
       return "available";
     },
@@ -155,10 +194,10 @@ export const useBookingBackend = () => {
 
   const isDateSelectable = useCallback((d: Date) => statusFor(d) === "available", [statusFor]);
 
-  /** Fully booked: available date whose capacity is consumed (red dot). */
+  /** Fully booked: open date whose capacity is consumed (red dot). */
   const isDateBooked = useCallback((d: Date) => statusFor(d) === "booked", [statusFor]);
 
-  /** Blocked by admin or not configured (gray). */
+  /** Explicitly blocked by the admin (gray). */
   const isDateUnavailable = useCallback((d: Date) => statusFor(d) === "blocked", [statusFor]);
 
 
@@ -171,6 +210,7 @@ export const useBookingBackend = () => {
     },
     [dayFor]
   );
+
 
   return useMemo(
     () => ({
